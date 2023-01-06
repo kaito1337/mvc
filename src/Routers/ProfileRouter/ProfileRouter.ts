@@ -7,8 +7,6 @@ export class ProfileRouter {
 
     constructor(private readonly ProfileController: ProfileController) {
         this._router = Router();
-        this._router.post('/createProfile', ProfileController.createProfile);
-        this._router.put('/addEditor', ProfileController.addEditor);
-        this._router.put('/addBook', ProfileController.addBook);
+        this._router.put('/updateProfile', ProfileController.updateProfile);
     }
 }

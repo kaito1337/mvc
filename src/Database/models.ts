@@ -11,17 +11,17 @@ const User = sequelize.define('user', {
     email: { type: DataTypes.STRING, unique: true },
     name: { type: DataTypes.STRING },
     password: { type: DataTypes.STRING },
+    takedBooks: { type: DataTypes.ARRAY(DataTypes.INTEGER) },
+    // по айди
+    listEditors: { type: DataTypes.ARRAY(DataTypes.INTEGER) }
+    // profile: { type: UserProfile },
 });
 
 User.beforeCreate(async (user) => {
     if (!validatePassword(user.dataValues.password) || !validateEmail(user.dataValues.email)) {
         throw new Error('Invalid password or email');
     }
-    try {
-        user.dataValues.password = await bcrypt.hash(user.dataValues.password, +Configuration.bcrypt.rounds);
-    } catch (e) {
-        throw new Error("Login and email must be unique");
-    }
+    user.dataValues.password = await bcrypt.hash(user.dataValues.password, +Configuration.bcrypt.rounds);
 })
 
 const UserProfile = sequelize.define('userProfile', {
@@ -32,8 +32,6 @@ const UserProfile = sequelize.define('userProfile', {
     country: { type: DataTypes.STRING },
     city: { type: DataTypes.STRING },
     favoriteAnimal: { type: DataTypes.STRING },
-    takedBooks: { type: DataTypes.ARRAY(DataTypes.STRING) },
-    listEditors: { type: DataTypes.ARRAY(DataTypes.STRING) }
 })
 
 UserProfile.beforeCreate(async (user) => {
@@ -61,10 +59,10 @@ const Editor = sequelize.define('editor', {
 
 User.hasOne(UserProfile)
 UserProfile.belongsTo(User);
-UserProfile.hasMany(Book);
-Book.belongsTo(UserProfile);
-UserProfile.belongsToMany(Editor, { through: 'EditorUser'});
-Editor.belongsToMany(UserProfile, { through: 'EditorUser'});
+User.hasMany(Book);
+Book.belongsTo(User);
+User.belongsToMany(Editor, { through: 'EditorUser'});
+Editor.belongsToMany(User, { through: 'EditorUser'});
 export {
     User,
     UserProfile,
